@@ -5,24 +5,14 @@ import SearchBar from "@/components/SearchBar"
 import { wp } from "@/helpers/commen"
 import * as DocumentPicker from "expo-document-picker"
 import * as FileSystem from "expo-file-system"
-import * as Permissions from "expo-permissions"
-
 import { useRouter } from "expo-router"
 
 const Library = () => {
   const [fileUri, setFileUri] = useState(null)
   const router = useRouter()
 
-  const requestPermissions = async () => {
-    const { status } = await Permissions.askAsync(Permissions.MEDIA_LIBRARY)
-    if (status !== "granted") {
-      console.log("Permission denied")
-    }
-  }
-
   const pickEpubFile = async () => {
     try {
-      // await requestPermissions()
       const res = await DocumentPicker.getDocumentAsync({
         type: "application/epub+zip",
         copyToCacheDirectory: false,
@@ -48,7 +38,6 @@ const Library = () => {
       console.log(error)
     }
   }
-  // console.log(fileUri)
 
   return (
     <ScreenWrapper>

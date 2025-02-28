@@ -23,6 +23,6 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     paddingHorizontal: wp(2),
     gap: 10,
-    paddingVertical: hp(0.2),
+    paddingVertical: hp(0.5),
   },
 })

@@ -1,7 +1,7 @@
 import { StyleSheet, Text, TextInput, View } from "react-native"
 import React from "react"
 import ScreenWrapper from "@/components/ScreenWrapper"
-import { Feather } from "@expo/vector-icons"
+
 import { hp, wp } from "../../helpers/commen"
 import SearchBar from "@/components/SearchBar"
 
@@ -42,6 +42,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     backgroundColor: "lightgrey",
     width: wp(80),
+    height: hp(15),
   },
   title: {
     fontWeight: "600",

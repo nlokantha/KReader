@@ -1,23 +1,28 @@
-import { Image, StyleSheet, Text, View } from "react-native"
-import React, { useEffect, useState } from "react"
+import { StyleSheet, View } from "react-native"
+import React from "react"
 import { useLocalSearchParams } from "expo-router"
-import { Reader, useReader } from "@epubjs-react-native/core"
+import { Reader, ReaderProvider } from "@epubjs-react-native/core"
 import { useFileSystem } from "@epubjs-react-native/expo-file-system"
-import WebView from "react-native-webview"
+import ScreenWrapper from "@/components/ScreenWrapper"
 
 const Book = () => {
   const { uri } = useLocalSearchParams()
-  console.log(uri)
-  const { goToLocation } = useReader()
 
   return (
-    <View style={{ flex: 1 }}>
-      {/* <Reader src={uri} fileSystem={useFileSystem} /> */}
-      <WebView source={{ uri }} />
-    </View>
+    <ScreenWrapper bg={"white"} style={{ flex: 1 }}>
+      <ReaderProvider>
+        <Reader src={uri} fileSystem={useFileSystem} />
+      </ReaderProvider>
+    </ScreenWrapper>
   )
 }
 
 export default Book
 
-const styles = StyleSheet.create({})
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+})
