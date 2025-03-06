@@ -10,6 +10,7 @@ import {
 import { useFileSystem } from "@epubjs-react-native/expo-file-system"
 import ScreenWrapper from "@/components/ScreenWrapper"
 import Slider from "@react-native-community/slider"
+import Header from "@/components/Header"
 
 const BookContent = () => {
   const { uri } = useLocalSearchParams()
@@ -18,6 +19,7 @@ const BookContent = () => {
 
   return (
     <View style={{ flex: 1 }}>
+      <Header />
       <Reader
         src={uri}
         fileSystem={useFileSystem}
