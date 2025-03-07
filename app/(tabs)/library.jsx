@@ -28,7 +28,7 @@ const Library = () => {
 
         setFileUri(newUri)
         router.push({
-          pathname: "/(Books)",
+          pathname: "/(books)",
           params: {
             uri: newUri,
           },

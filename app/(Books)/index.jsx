@@ -11,20 +11,42 @@ import { useFileSystem } from "@epubjs-react-native/expo-file-system"
 import ScreenWrapper from "@/components/ScreenWrapper"
 import Slider from "@react-native-community/slider"
 import Header from "@/components/Header"
+import { wp } from "@/helpers/commen"
+import { GestureHandlerRootView } from "react-native-gesture-handler"
+import { BottomSheetModal } from "@gorhom/bottom-sheet"
 
 const BookContent = () => {
   const { uri } = useLocalSearchParams()
   const [fontSize, setFontSize] = useState(16) // Default font size
-  const { theme, changeFontSize } = useReader()
+  const { theme, changeFontSize, annotations } = useReader()
+
+  const bookmarksListRef = React.useRef < BottomSheetModal > null
+  const searchListRef = React.useRef < BottomSheetModal > null
+  const tableOfContentsRef = React.useRef < BottomSheetModal > null
+  const annotationsListRef = React.useRef < BottomSheetModal > null
+
+  // const [tempMark, setTempMark] = (React.useState < Annotation) | (null > null)
+  // const [selection, setSelection] =
+  //   (React.useState <
+  //     {
+  //       cfiRange,
+  //       text,
+  //     }) |
+  //   (null > null)
+  // const [selectedAnnotation, setSelectedAnnotation] =
+  //   (React.useState < Annotation) | (undefined > undefined)
+
+  const open = () => {}
 
   return (
-    <View style={{ flex: 1 }}>
+    <View style={{ flex: 1, paddingHorizontal: wp(4) }}>
       <Header />
       <Reader
         src={uri}
         fileSystem={useFileSystem}
         flow="scrolled-doc"
         spread="auto"
+        me
       />
       <View style={styles.controls}>
         <Text>Font Size: {fontSize}px</Text>
@@ -47,9 +69,11 @@ const BookContent = () => {
 const Book = () => {
   return (
     <ScreenWrapper bg={"white"} style={{ flex: 1 }}>
-      <ReaderProvider>
-        <BookContent />
-      </ReaderProvider>
+      <GestureHandlerRootView>
+        <ReaderProvider>
+          <BookContent />
+        </ReaderProvider>
+      </GestureHandlerRootView>
     </ScreenWrapper>
   )
 }
