@@ -1,6 +1,6 @@
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native"
-import React from "react"
-import { AntDesign } from "@expo/vector-icons"
+import React, { useState } from "react"
+import { AntDesign, FontAwesome } from "@expo/vector-icons"
 import { useRouter } from "expo-router"
 import {
   ReaderProvider,
@@ -10,8 +10,9 @@ import {
   Annotation,
 } from "@epubjs-react-native/core"
 import { themes } from "./utils"
+import { wp } from "@/helpers/commen"
 
-const Header = () => {
+const Header = ({ handlePresentModalPress, onPressSearch }) => {
   const {
     theme,
     annotations,
@@ -23,7 +24,7 @@ const Header = () => {
     removeAnnotation,
   } = useReader()
   const router = useRouter()
-
+  const [showSettings, setShowSettings] = useState(false)
   const switchTheme = () => {
     const index = Object.values(themes).indexOf(theme)
     const nextTheme =
@@ -42,11 +43,15 @@ const Header = () => {
         <TouchableOpacity style={styles.buttonContainer}>
           <AntDesign name="bars" size={24} color="black" />
         </TouchableOpacity>
-        <TouchableOpacity style={styles.buttonContainer}>
-          <AntDesign name="bars" size={24} color="black" />
+        <TouchableOpacity
+          onPress={handlePresentModalPress}
+          style={styles.buttonContainer}>
+          <FontAwesome name="font" size={24} color="black" />
         </TouchableOpacity>
-        <TouchableOpacity style={styles.buttonContainer}>
-          <AntDesign name="bars" size={24} color="black" />
+        <TouchableOpacity
+          onPress={onPressSearch}
+          style={styles.buttonContainer}>
+          <AntDesign name="search1" size={24} color="black" />
         </TouchableOpacity>
         <TouchableOpacity onPress={switchTheme} style={styles.buttonContainer}>
           <AntDesign name="setting" size={24} color="black" />
@@ -64,6 +69,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     marginBottom: 10,
+    paddingHorizontal: wp(4),
   },
   buttonContainer: {
     backgroundColor: "lightgrey",

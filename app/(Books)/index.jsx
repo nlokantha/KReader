@@ -1,5 +1,5 @@
-import { StyleSheet, View, Text } from "react-native"
-import React, { useState } from "react"
+import { StyleSheet, View, Text, Button } from "react-native"
+import React, { useCallback, useRef, useState } from "react"
 import { useLocalSearchParams } from "expo-router"
 import {
   Reader,
@@ -13,34 +13,35 @@ import Slider from "@react-native-community/slider"
 import Header from "@/components/Header"
 import { wp } from "@/helpers/commen"
 import { GestureHandlerRootView } from "react-native-gesture-handler"
-import { BottomSheetModal } from "@gorhom/bottom-sheet"
+import {
+  BottomSheetModal,
+  BottomSheetView,
+  BottomSheetModalProvider,
+} from "@gorhom/bottom-sheet"
+import SearchList from "@/components/SearchList"
 
 const BookContent = () => {
   const { uri } = useLocalSearchParams()
   const [fontSize, setFontSize] = useState(16) // Default font size
   const { theme, changeFontSize, annotations } = useReader()
 
-  const bookmarksListRef = React.useRef < BottomSheetModal > null
-  const searchListRef = React.useRef < BottomSheetModal > null
-  const tableOfContentsRef = React.useRef < BottomSheetModal > null
-  const annotationsListRef = React.useRef < BottomSheetModal > null
+  const bottomSheetModalRef = useRef(null)
+  const searchListRef = useRef(null)
 
-  // const [tempMark, setTempMark] = (React.useState < Annotation) | (null > null)
-  // const [selection, setSelection] =
-  //   (React.useState <
-  //     {
-  //       cfiRange,
-  //       text,
-  //     }) |
-  //   (null > null)
-  // const [selectedAnnotation, setSelectedAnnotation] =
-  //   (React.useState < Annotation) | (undefined > undefined)
-
-  const open = () => {}
+  // callbacks
+  const handlePresentModalPress = useCallback(() => {
+    bottomSheetModalRef.current?.present()
+  }, [])
+  const handleSheetChanges = useCallback((index) => {
+    console.log("handleSheetChanges", index)
+  }, [])
 
   return (
-    <View style={{ flex: 1, paddingHorizontal: wp(4) }}>
-      <Header />
+    <View style={{ flex: 1 }}>
+      <Header
+        handlePresentModalPress={handlePresentModalPress}
+        onPressSearch={() => searchListRef.current?.present()}
+      />
       <Reader
         src={uri}
         fileSystem={useFileSystem}
@@ -48,20 +49,30 @@ const BookContent = () => {
         spread="auto"
         me
       />
-      <View style={styles.controls}>
-        <Text>Font Size: {fontSize}px</Text>
-        <Slider
-          style={{ width: "80%" }}
-          minimumValue={12}
-          maximumValue={32}
-          step={2}
-          value={fontSize}
-          onValueChange={(value) => {
-            setFontSize(value)
-            changeFontSize(`${value}px`)
-          }}
-        />
-      </View>
+      {/* controls */}
+
+      <BottomSheetModal ref={bottomSheetModalRef} onChange={handleSheetChanges}>
+        <BottomSheetView style={styles.contentContainer}>
+          <View style={styles.controls}>
+            <Text>Font Size: {fontSize}px</Text>
+            <Slider
+              style={{ width: "80%" }}
+              minimumValue={12}
+              maximumValue={32}
+              step={2}
+              value={fontSize}
+              onValueChange={(value) => {
+                setFontSize(value)
+                changeFontSize(`${value}px`)
+              }}
+            />
+          </View>
+        </BottomSheetView>
+      </BottomSheetModal>
+      <SearchList
+        ref={searchListRef}
+        onClose={() => searchListRef.current?.dismiss()}
+      />
     </View>
   )
 }
@@ -70,9 +81,11 @@ const Book = () => {
   return (
     <ScreenWrapper bg={"white"} style={{ flex: 1 }}>
       <GestureHandlerRootView>
-        <ReaderProvider>
-          <BookContent />
-        </ReaderProvider>
+        <BottomSheetModalProvider>
+          <ReaderProvider>
+            <BookContent />
+          </ReaderProvider>
+        </BottomSheetModalProvider>
       </GestureHandlerRootView>
     </ScreenWrapper>
   )
@@ -91,5 +104,9 @@ const styles = StyleSheet.create({
     width: "100%",
     alignItems: "center",
     backgroundColor: "#f5f5f5",
+  },
+  contentContainer: {
+    flex: 1,
+    alignItems: "center",
   },
 })
