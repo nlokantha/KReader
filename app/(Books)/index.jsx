@@ -19,14 +19,16 @@ import {
   BottomSheetModalProvider,
 } from "@gorhom/bottom-sheet"
 import SearchList from "@/components/SearchList"
+import TableOfContents from "@/components/TableOfContents"
 
 const BookContent = () => {
   const { uri } = useLocalSearchParams()
   const [fontSize, setFontSize] = useState(16) // Default font size
-  const { theme, changeFontSize, annotations } = useReader()
+  const { theme, changeFontSize, annotations, goToLocation } = useReader()
 
   const bottomSheetModalRef = useRef(null)
   const searchListRef = useRef(null)
+  const tableOfContentRef = useRef(null)
 
   // callbacks
   const handlePresentModalPress = useCallback(() => {
@@ -41,6 +43,7 @@ const BookContent = () => {
       <Header
         handlePresentModalPress={handlePresentModalPress}
         onPressSearch={() => searchListRef.current?.present()}
+        onOpenTocList={() => tableOfContentRef.current?.present()}
       />
       <Reader
         src={uri}
@@ -72,6 +75,14 @@ const BookContent = () => {
       <SearchList
         ref={searchListRef}
         onClose={() => searchListRef.current?.dismiss()}
+      />
+      <TableOfContents
+        ref={tableOfContentRef}
+        onPressSection={(section) => {
+          goToLocation(section.href.split("/")[1])
+          tableOfContentRef.current?.dismiss()
+        }}
+        onClose={() => tableOfContentRef.current?.dismiss()}
       />
     </View>
   )

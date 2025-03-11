@@ -12,7 +12,7 @@ import {
 import { themes } from "./utils"
 import { wp } from "@/helpers/commen"
 
-const Header = ({ handlePresentModalPress, onPressSearch }) => {
+const Header = ({ handlePresentModalPress, onPressSearch, onOpenTocList }) => {
   const {
     theme,
     annotations,
@@ -40,7 +40,9 @@ const Header = ({ handlePresentModalPress, onPressSearch }) => {
         <AntDesign name="left" size={24} color="black" />
       </TouchableOpacity>
       <View style={{ gap: 10, flexDirection: "row" }}>
-        <TouchableOpacity style={styles.buttonContainer}>
+        <TouchableOpacity
+          onPress={onOpenTocList}
+          style={styles.buttonContainer}>
           <AntDesign name="bars" size={24} color="black" />
         </TouchableOpacity>
         <TouchableOpacity
