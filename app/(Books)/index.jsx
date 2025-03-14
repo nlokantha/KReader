@@ -1,5 +1,12 @@
-import { StyleSheet, View, Text, Button } from "react-native"
-import React, { useCallback, useRef, useState } from "react"
+import {
+  StyleSheet,
+  View,
+  Text,
+  Button,
+  TextInput,
+  TouchableOpacity,
+} from "react-native"
+import React, { useCallback, useEffect, useRef, useState } from "react"
 import { useLocalSearchParams } from "expo-router"
 import {
   Reader,
@@ -20,23 +27,51 @@ import {
 } from "@gorhom/bottom-sheet"
 import SearchList from "@/components/SearchList"
 import TableOfContents from "@/components/TableOfContents"
+import Location from "@/components/Location"
 
 const BookContent = () => {
   const { uri } = useLocalSearchParams()
   const [fontSize, setFontSize] = useState(16) // Default font size
-  const { theme, changeFontSize, annotations, goToLocation } = useReader()
+  const [page, setPage] = useState(0)
+  const {
+    theme,
+    changeFontSize,
+    annotations,
+    goToLocation,
+    getLocations,
+    currentLocation,
+    totalLocations,
+    injectJavascript,
+  } = useReader()
 
   const bottomSheetModalRef = useRef(null)
   const searchListRef = useRef(null)
   const tableOfContentRef = useRef(null)
 
-  // callbacks
   const handlePresentModalPress = useCallback(() => {
     bottomSheetModalRef.current?.present()
   }, [])
   const handleSheetChanges = useCallback((index) => {
     console.log("handleSheetChanges", index)
   }, [])
+
+  const goToPage = () => {
+    const pageNum = parseInt(page, 10)
+    if (!isNaN(pageNum)) {
+      injectJavascript(`
+        try {
+          const cfi = book.locations.cfiFromPercentage(${pageNum} / ${totalLocations});
+          window.ReactNativeWebView.postMessage(JSON.stringify({ type: "onCfiFromPercentage", cfi })); true
+        } catch (error) {
+          alert(error?.message);
+        }
+      `)
+    }
+  }
+
+  useEffect(() => {
+    setPage(currentLocation?.start?.location)
+  }, [currentLocation?.start?.location])
 
   return (
     <View style={{ flex: 1 }}>
@@ -48,10 +83,16 @@ const BookContent = () => {
       <Reader
         src={uri}
         fileSystem={useFileSystem}
-        flow="scrolled-doc"
+        flow="paginated"
         spread="auto"
-        me
+        onWebViewMessage={(message) => {
+          if (message.type === "onCfiFromPercentage") {
+            goToLocation(message.cfi)
+          }
+        }}
       />
+
+      <Location />
       {/* controls */}
 
       <BottomSheetModal ref={bottomSheetModalRef} onChange={handleSheetChanges}>
@@ -69,6 +110,34 @@ const BookContent = () => {
                 changeFontSize(`${value}px`)
               }}
             />
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "center",
+                alignItems: "center",
+                gap: 10,
+              }}>
+              <TextInput
+                placeholder="Page Number"
+                onChangeText={(value) => setPage(value)}
+                style={{
+                  borderRadius: 10,
+                  borderWidth: 1,
+                  width: wp(50),
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              />
+              <TouchableOpacity
+                onPress={goToPage}
+                style={{
+                  borderRadius: 5,
+                  backgroundColor: "black",
+                  padding: 10,
+                }}>
+                <Text style={{ color: "white" }}>GO</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </BottomSheetView>
       </BottomSheetModal>
