@@ -18,7 +18,7 @@ import { useFileSystem } from "@epubjs-react-native/expo-file-system"
 import ScreenWrapper from "@/components/ScreenWrapper"
 import Slider from "@react-native-community/slider"
 import Header from "@/components/Header"
-import { wp } from "@/helpers/commen"
+import { hp, wp } from "@/helpers/commen"
 import { GestureHandlerRootView } from "react-native-gesture-handler"
 import {
   BottomSheetModal,
@@ -69,9 +69,9 @@ const BookContent = () => {
     }
   }
 
-  useEffect(() => {
-    setPage(currentLocation?.start?.location)
-  }, [currentLocation?.start?.location])
+  // useEffect(() => {
+  //   setPage(currentLocation?.start?.location)
+  // }, [currentLocation?.start?.location])
 
   return (
     <View style={{ flex: 1 }}>
@@ -84,7 +84,7 @@ const BookContent = () => {
         src={uri}
         fileSystem={useFileSystem}
         flow="paginated"
-        spread="auto"
+        spread="none"
         onWebViewMessage={(message) => {
           if (message.type === "onCfiFromPercentage") {
             goToLocation(message.cfi)
@@ -124,6 +124,7 @@ const BookContent = () => {
                   borderRadius: 10,
                   borderWidth: 1,
                   width: wp(50),
+                  height: hp(5),
                   justifyContent: "center",
                   alignItems: "center",
                 }}
@@ -184,6 +185,7 @@ const styles = StyleSheet.create({
     width: "100%",
     alignItems: "center",
     backgroundColor: "#f5f5f5",
+    flex: 1,
   },
   contentContainer: {
     flex: 1,
