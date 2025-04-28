@@ -10,7 +10,7 @@ import {
   Annotation,
 } from "@epubjs-react-native/core"
 import { themes } from "./utils"
-import { wp } from "@/helpers/commen"
+import { hp, wp } from "@/helpers/commen"
 
 const Header = ({ handlePresentModalPress, onPressSearch, onOpenTocList }) => {
   const {
@@ -37,26 +37,26 @@ const Header = ({ handlePresentModalPress, onPressSearch, onOpenTocList }) => {
       <TouchableOpacity
         onPress={() => router.back()}
         style={styles.buttonContainer}>
-        <AntDesign name="left" size={24} color="black" />
+        <AntDesign name="left" size={hp(3)} color="black" />
       </TouchableOpacity>
       <View style={{ gap: 10, flexDirection: "row" }}>
         <TouchableOpacity
           onPress={onOpenTocList}
           style={styles.buttonContainer}>
-          <AntDesign name="bars" size={24} color="black" />
+          <AntDesign name="bars" size={hp(3)} color="black" />
         </TouchableOpacity>
         <TouchableOpacity
           onPress={handlePresentModalPress}
           style={styles.buttonContainer}>
-          <FontAwesome name="font" size={24} color="black" />
+          <FontAwesome name="font" size={hp(3)} color="black" />
         </TouchableOpacity>
         <TouchableOpacity
           onPress={onPressSearch}
           style={styles.buttonContainer}>
-          <AntDesign name="search1" size={24} color="black" />
+          <AntDesign name="search1" size={hp(3)} color="black" />
         </TouchableOpacity>
         <TouchableOpacity onPress={switchTheme} style={styles.buttonContainer}>
-          <AntDesign name="setting" size={24} color="black" />
+          <AntDesign name="setting" size={hp(3)} color="black" />
         </TouchableOpacity>
       </View>
     </View>

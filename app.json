@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "KReader",
-    "slug": "KReader",
+    "name": "eNote",
+    "slug": "eNote",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -44,7 +44,7 @@
         "origin": false
       },
       "eas": {
-        "projectId": "1359df69-b37f-493b-ad58-8f3fc9fa92d3"
+        "projectId": "9b29a238-b806-4720-997b-f2c855661ce3"
       }
     }
   }

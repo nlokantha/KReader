@@ -10,12 +10,12 @@ const Home = () => {
     <ScreenWrapper bg={"white"}>
       <View style={styles.container}>
         {/* searchBar */}
-        <SearchBar />
+        {/* <SearchBar /> */}
 
         {/* welcome note */}
         <View style={{ justifyContent: "center", alignItems: "center" }}>
           <View style={styles.welcomeContainer}>
-            <Text style={styles.title}>Welcome to KReader!</Text>
+            <Text style={styles.title}>Welcome to eNote!</Text>
             <Text>
               Find Your next great read by browsing top picks and recommendation
               below,or shop the store
@@ -46,6 +46,6 @@ const styles = StyleSheet.create({
   },
   title: {
     fontWeight: "600",
-    fontSize: 18,
+    fontSize: hp(2.8),
   },
 })

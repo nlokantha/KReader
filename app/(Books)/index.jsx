@@ -31,7 +31,7 @@ import Location from "@/components/Location"
 
 const BookContent = () => {
   const { uri } = useLocalSearchParams()
-  const [fontSize, setFontSize] = useState(16) // Default font size
+  const [fontSize, setFontSize] = useState(24) // Default font size
   const [page, setPage] = useState(0)
   const {
     theme,
@@ -98,13 +98,13 @@ const BookContent = () => {
       <BottomSheetModal ref={bottomSheetModalRef} onChange={handleSheetChanges}>
         <BottomSheetView style={styles.contentContainer}>
           <View style={styles.controls}>
-            <Text>Font Size: {fontSize}px</Text>
+            <Text>Font Size: {fontSize || 24}px</Text>
             <Slider
               style={{ width: "80%" }}
               minimumValue={12}
               maximumValue={32}
               step={2}
-              value={fontSize}
+              value={fontSize || 24}
               onValueChange={(value) => {
                 setFontSize(value)
                 changeFontSize(`${value}px`)
@@ -115,7 +115,7 @@ const BookContent = () => {
                 flexDirection: "row",
                 justifyContent: "center",
                 alignItems: "center",
-                gap: 10,
+                gap: 20,
               }}>
               <TextInput
                 placeholder="Page Number"
@@ -124,7 +124,7 @@ const BookContent = () => {
                   borderRadius: 10,
                   borderWidth: 1,
                   width: wp(50),
-                  height: hp(5),
+                  height: hp(3),
                   justifyContent: "center",
                   alignItems: "center",
                 }}
@@ -186,6 +186,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "#f5f5f5",
     flex: 1,
+    gap: 10,
   },
   contentContainer: {
     flex: 1,
