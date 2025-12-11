@@ -28,11 +28,21 @@ import {
 import SearchList from "@/components/SearchList"
 import TableOfContents from "@/components/TableOfContents"
 import Location from "@/components/Location"
+import DrawingOverlay from "@/components/DrawingOverlay"
+import SavedNotes from "@/components/SavedNotes"
+import PersistentDrawings from "@/components/PersistentDrawings"
+import AsyncStorage from "@react-native-async-storage/async-storage"
+import { Dimensions } from "react-native"
+import { Skia } from "@shopify/react-native-skia"
 
 const BookContent = () => {
   const { uri } = useLocalSearchParams()
   const [fontSize, setFontSize] = useState(24) // Default font size
   const [page, setPage] = useState(0)
+  const [notes, setNotes] = useState([])
+  const [isDrawingMode, setIsDrawingMode] = useState(false)
+  const [currentPageDrawings, setCurrentPageDrawings] = useState([])
+  const [showDrawings, setShowDrawings] = useState(true)
   const {
     theme,
     changeFontSize,
@@ -47,6 +57,7 @@ const BookContent = () => {
   const bottomSheetModalRef = useRef(null)
   const searchListRef = useRef(null)
   const tableOfContentRef = useRef(null)
+  const savedNotesRef = useRef(null)
 
   const handlePresentModalPress = useCallback(() => {
     bottomSheetModalRef.current?.present()
@@ -69,6 +80,31 @@ const BookContent = () => {
     }
   }
 
+  // Load saved notes when component mounts
+  useEffect(() => {
+    const loadNotes = async () => {
+      try {
+        const savedNotes = await AsyncStorage.getItem(`notes_${uri}`)
+        if (savedNotes) {
+          setNotes(JSON.parse(savedNotes))
+        }
+      } catch (error) {
+        console.error("Error loading notes:", error)
+      }
+    }
+    loadNotes()
+  }, [uri])
+
+  // Load drawings for current page
+  useEffect(() => {
+    if (currentLocation?.start?.cfi) {
+      const pageNote = notes.find(
+        (n) => n.location?.start?.cfi === currentLocation.start.cfi
+      )
+      setCurrentPageDrawings(pageNote?.paths || [])
+    }
+  }, [currentLocation?.start?.cfi, notes])
+
   // useEffect(() => {
   //   setPage(currentLocation?.start?.location)
   // }, [currentLocation?.start?.location])
@@ -79,6 +115,18 @@ const BookContent = () => {
         handlePresentModalPress={handlePresentModalPress}
         onPressSearch={() => searchListRef.current?.present()}
         onOpenTocList={() => tableOfContentRef.current?.present()}
+        onOpenDrawing={() => {
+          setIsDrawingMode(true)
+          // Load existing drawings for current page
+          const pageDrawings = notes.find(
+            (n) => n.location?.start?.cfi === currentLocation?.start?.cfi
+          )
+          setCurrentPageDrawings(pageDrawings?.paths || [])
+        }}
+        onOpenSavedNotes={() => savedNotesRef.current?.present()}
+        isDrawingMode={isDrawingMode}
+        showDrawings={showDrawings}
+        onToggleDrawings={() => setShowDrawings((prev) => !prev)}
       />
       <Reader
         src={uri}
@@ -93,6 +141,16 @@ const BookContent = () => {
       />
 
       <Location />
+      
+      {/* Display persistent drawings on current page */}
+      <PersistentDrawings
+        notes={notes}
+        currentLocation={currentLocation}
+        width={Dimensions.get("window").width}
+        height={Dimensions.get("window").height}
+        show={showDrawings}
+      />
+      
       {/* controls */}
 
       <BottomSheetModal ref={bottomSheetModalRef} onChange={handleSheetChanges}>
@@ -154,6 +212,86 @@ const BookContent = () => {
         }}
         onClose={() => tableOfContentRef.current?.dismiss()}
       />
+      
+      {/* Drawing Overlay - appears on top of the book */}
+      <DrawingOverlay
+        isDrawingMode={isDrawingMode}
+        existingPaths={currentPageDrawings}
+        width={Dimensions.get("window").width}
+        height={Dimensions.get("window").height}
+        onSaveDrawing={async (newPaths) => {
+          // newPaths already has svgPath from DrawingOverlay
+          
+          // Check if this page already has drawings
+          const existingNoteIndex = notes.findIndex(
+            (n) => n.location?.start?.cfi === currentLocation?.start?.cfi
+          )
+          
+          let updatedNotes
+          if (existingNoteIndex >= 0) {
+            // Replace existing note with edited paths
+            const updatedNote = {
+              ...notes[existingNoteIndex],
+              paths: newPaths,
+              updatedAt: new Date().toISOString(),
+            }
+            updatedNotes = [
+              ...notes.slice(0, existingNoteIndex),
+              updatedNote,
+              ...notes.slice(existingNoteIndex + 1),
+            ]
+          } else {
+            // Create new note
+            const newNote = {
+              id: Date.now().toString(),
+              paths: newPaths,
+              location: currentLocation,
+              createdAt: new Date().toISOString(),
+            }
+            updatedNotes = [...notes, newNote]
+          }
+          
+          setNotes(updatedNotes)
+          setCurrentPageDrawings(
+            updatedNotes.find(
+              (n) => n.location?.start?.cfi === currentLocation?.start?.cfi
+            )?.paths || []
+          )
+          try {
+            await AsyncStorage.setItem(
+              `notes_${uri}`,
+              JSON.stringify(updatedNotes)
+            )
+          } catch (error) {
+            console.error("Error saving note:", error)
+          }
+          setIsDrawingMode(false)
+        }}
+        onClose={() => setIsDrawingMode(false)}
+      />
+      
+      <SavedNotes
+        ref={savedNotesRef}
+        notes={notes}
+        onDeleteNote={async (noteId) => {
+          const updatedNotes = notes.filter((n) => n.id !== noteId)
+          setNotes(updatedNotes)
+          try {
+            await AsyncStorage.setItem(
+              `notes_${uri}`,
+              JSON.stringify(updatedNotes)
+            )
+          } catch (error) {
+            console.error("Error deleting note:", error)
+          }
+        }}
+        onGoToNote={(note) => {
+          if (note.location?.start?.cfi) {
+            goToLocation(note.location.start.cfi)
+            savedNotesRef.current?.dismiss()
+          }
+        }}
+      />
     </View>
   )
 }
@@ -161,7 +299,7 @@ const BookContent = () => {
 const Book = () => {
   return (
     <ScreenWrapper bg={"white"} style={{ flex: 1 }}>
-      <GestureHandlerRootView>
+      <GestureHandlerRootView style={{ flex: 1 }}>
         <BottomSheetModalProvider>
           <ReaderProvider>
             <BookContent />

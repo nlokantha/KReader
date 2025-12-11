@@ -12,7 +12,7 @@ import {
 import { themes } from "./utils"
 import { hp, wp } from "@/helpers/commen"
 
-const Header = ({ handlePresentModalPress, onPressSearch, onOpenTocList }) => {
+const Header = ({ handlePresentModalPress, onPressSearch, onOpenTocList, onOpenDrawing, onOpenSavedNotes, onToggleDrawings, isDrawingMode, showDrawings }) => {
   const {
     theme,
     annotations,
@@ -55,6 +55,28 @@ const Header = ({ handlePresentModalPress, onPressSearch, onOpenTocList }) => {
           style={styles.buttonContainer}>
           <AntDesign name="search1" size={hp(3)} color="black" />
         </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => {
+            if (onOpenDrawing) {
+              onOpenDrawing()
+            }
+          }}
+          style={[
+            styles.buttonContainer,
+            isDrawingMode && styles.activeButton
+          ]}>
+          <AntDesign name="edit" size={hp(3)} color={isDrawingMode ? "white" : "black"} />
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={onToggleDrawings}
+          style={styles.buttonContainer}>
+          <AntDesign name={showDrawings ? "eye" : "eyeo"} size={hp(3)} color="black" />
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={onOpenSavedNotes}
+          style={styles.buttonContainer}>
+          <AntDesign name="book" size={hp(3)} color="black" />
+        </TouchableOpacity>
         <TouchableOpacity onPress={switchTheme} style={styles.buttonContainer}>
           <AntDesign name="setting" size={hp(3)} color="black" />
         </TouchableOpacity>
@@ -78,5 +100,8 @@ const styles = StyleSheet.create({
     padding: 5,
     borderRadius: 10,
     borderCurve: "continuous",
+  },
+  activeButton: {
+    backgroundColor: "#007AFF",
   },
 })
