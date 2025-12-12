@@ -394,7 +394,8 @@ const styles = StyleSheet.create({
   },
   toolsContainer: {
     position: "absolute",
-    bottom: 20,
+    // bottom: 20,
+    top: 50,
     left: 10,
     right: 10,
     backgroundColor: "rgba(0,0,0,0.8)",
@@ -462,7 +463,7 @@ const styles = StyleSheet.create({
   },
   toggleButton: {
     position: "absolute",
-    bottom: 10,
+    top:50,
     right: 10,
     backgroundColor: "rgba(0,0,0,0.7)",
     padding: 8,
